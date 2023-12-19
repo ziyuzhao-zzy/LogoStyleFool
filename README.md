@@ -3,7 +3,7 @@
 # LogoStyleFool
 
 <div align="center">
-  <img src="Images/Fig1.png" width="800px" />
+  <img src="images/Fig1.png" width="800px" />
 </div>
 
 This is the source code for our paper "LogoStyleFool: Vitiating Video Recognition Systems via Logo Style Transfer" (AAAI 2024).
@@ -24,7 +24,7 @@ This is the source code for our paper "LogoStyleFool: Vitiating Video Recognitio
 Please download the action recognition dataset [UCF-101](http://crcv.ucf.edu/data/UCF101.php) and [HMDB51](https://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/#Downloads), then process and save them in 'data/'. We use the same preprocessing as [StyleFool](https://github.com/JosephCao0327/StyleFool).
 
 ## Pretrained model
-The pre-trained model for C3D on UCF-101 is provided [here]().
+The pre-trained model for C3D on UCF-101, as well as models for style transfer, is provided [here](https://1drv.ms/u/s!Aj2hSJitqRWpgVj6TzNI56C7OwhK?e=Ve5kpl).
 
 ## Usage
 
