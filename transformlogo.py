@@ -1,8 +1,8 @@
-import numpy as np
-import torch
-import torchvision.transforms as transforms
-import cv2 as cv
 import os
+import cv2 as cv
+import torchvision.transforms as transforms
+
+
 class_folder1 = sorted(os.listdir('logos'))
 transf = transforms.ToTensor()
 logoset = []

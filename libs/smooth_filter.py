@@ -319,14 +319,14 @@ src = '''
 		return ;
 	}
 	'''
-
+ 
+from collections import namedtuple
+from cupy.cuda import function
 import cv2
-import torch
 import numpy as np
 from PIL import Image
-from cupy.cuda import function
 from pynvrtc.compiler import Program
-from collections import namedtuple
+import torch
 
 
 def smooth_local_affine(output_cpu, input_cpu, epsilon, patch, h, w, f_r, f_e):
@@ -376,7 +376,6 @@ def smooth_local_affine(output_cpu, input_cpu, epsilon, patch, h, w, f_r, f_e):
     numpy_filtered_best_output = filtered_best_output.cpu().numpy()
     return numpy_filtered_best_output
 
-
 def smooth_filter(initImg, contentImg, f_radius=15,f_edge=1e-1):
 	'''
 	:param initImg: intermediate output. Either image path or PIL Image
@@ -384,7 +383,7 @@ def smooth_filter(initImg, contentImg, f_radius=15,f_edge=1e-1):
 	:return: stylized output image. PIL Image
 	'''
 	if type(initImg) == str:
-	    initImg = Image.open(initImg).convert("RGB")
+		initImg = Image.open(initImg).convert("RGB")
 	best_image_bgr = np.array(initImg, dtype=np.float32)
 	bW, bH, bC = best_image_bgr.shape
 	best_image_bgr = best_image_bgr[:, :, ::-1]

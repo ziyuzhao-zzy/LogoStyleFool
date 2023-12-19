@@ -1,10 +1,18 @@
 import argparse
+import logging
 import os
+import numpy as np
+import torch
+from model_init import model_initial
+from Runattack import untargetted_attack, targetted_attack
+from generate_video import tensor_to_video
+
+
 parser = argparse.ArgumentParser(description='LogoStyleFool_attacking')
 parser.add_argument('--model', type=str, default='C3D', choices=['C3D', 'I3D'], help='the attacked model')
 parser.add_argument('--dataset', type=str, default='UCF101', choices=['UCF101', 'HMDB51'], help='the dataset')
 parser.add_argument('--gpu',  type=int, default=0, help='use which gpu')
-parser.add_argument('--video_npy_path', type=str, default='/home/zzy/UCF/UCF-101_npy/ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c01.npy', help='the video path in npy forms')
+parser.add_argument('--video_npy_path', type=str, default='/your/UCF-101/path/ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c01.npy', help='the video path in npy forms')
 parser.add_argument('--label', type=int, default=0, help='label of the video')
 parser.add_argument('--target', action='store_true', help='targeted attack or untargeted attack (default)')
 parser.add_argument('--target_class', type=int, default=1, help='target attack class')
@@ -20,14 +28,7 @@ parser.add_argument('--epsilon', type=float, default=0.2, help='epsilon of LogoS
 parser.add_argument('--linf_bound', type=float, default=0.1, help='linf bound of perturbation')
 args = parser.parse_args()
 os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
-import torch
-import cv2 as cv
-import numpy as np
-from model_init import model_initial
-import torchvision.transforms as transforms
-from Runattack import untargetted_attack, targetted_attack
-import logging
-from generate_video import tensor_to_video
+
 if __name__ == '__main__':
     target = args.target
     mod = args.model

@@ -1,11 +1,12 @@
+import logging
 import os
 import torch
 from easydict import EasyDict as edict
 from Agent import agent
 from config import LogoA_cfg
 from transformlogo import logoset
-from style_transfer import style_perturb_logo
-import logging
+
+
 class LogoA():
     def __init__(self, dir_title):
         # attack dirs

@@ -2,6 +2,7 @@ import os
 import torch
 from easydict import EasyDict as edict
 
+
 # LogoAttack config
 LogoA_cfg = edict()
 

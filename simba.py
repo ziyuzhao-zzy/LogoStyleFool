@@ -1,11 +1,14 @@
-import torch
-from torch import nn
+import logging
 import numpy as np
 from scipy.fftpack import idct
+import torch
 import torchvision.transforms as transforms
 from torchvision.transforms import Resize
-import logging
+
+
 unloader = transforms.ToPILImage()
+
+
 def expand_vector(x, size, logo_size):
     x = x.view(16, 3, size, size)
     z = torch.zeros(16, 3, logo_size, logo_size)
@@ -86,7 +89,6 @@ def simba_dct(model, clip, label, h, w, size, max_iters, freq_dims, epsilon, lin
 
     expand_dims = freq_dims
     n_dims = 16 * 3 * expand_dims * expand_dims
-    indices = torch.randperm(n_dims)[:max_iters]
     x = torch.zeros(n_dims).cuda()
 
     probs = torch.zeros(max_iters).cuda()
@@ -122,7 +124,6 @@ def simba_dct(model, clip, label, h, w, size, max_iters, freq_dims, epsilon, lin
             break
         if k > 0:
             succs[k-1] = ~remaining
-        
         
         dim = torch.randint(0, 3 * expand_dims * expand_dims, (1, )).cuda()
         for i in range(15):

@@ -1,6 +1,7 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
+
 
 class InceptionI3D_K_Model():
     def __init__(self, model):

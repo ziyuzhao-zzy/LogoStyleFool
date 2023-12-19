@@ -1,13 +1,14 @@
-import json
-import os
 import logging
-import torch
-import torchvision.transforms as transforms
-import Attack
 import numpy as np
+import torch
+import Attack
 from config import configure_LogoA
 from simba import simba_perturb, simba_dct
+
+
 ks = [0.75, 0.8125, 0.875, 0.9375, 1.0] # the scaling ratio of logo size
+
+
 def untargetted_attack(vid_path, model, label, rl_batch = 30, steps = 50, sigma = 250, tau = 5, logo_num = 10, style_num = 5, epsilon = 0.2):
     vid = np.load(vid_path).transpose(0, 3, 1, 2)/255
     vid = torch.tensor(vid, dtype=torch.float, device='cuda')

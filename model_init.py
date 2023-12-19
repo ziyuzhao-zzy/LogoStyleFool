@@ -3,6 +3,7 @@ from models import C3D
 from vid_model_top_k import I3D_K_Model, C3D_K_Model
 from pytorch_i3d import InceptionI3d
 
+
 def model_initial(model, dataset):
     if model == 'C3D' and dataset == 'UCF101':
         model = C3D(num_classes=101, pretrained=False).cuda()

@@ -1,19 +1,19 @@
-import cv2
-import time
-import numpy as np
 import logging
+import time
+import utils
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision.transforms import Resize
 from torch.distributions.categorical import Categorical
 from torch.utils.data import TensorDataset, DataLoader
-import utils
-from torchvision import transforms
 from style_transfer import style_perturb_logo
+
+
 # global variables
 eps = np.finfo(np.float32).eps.item()
+
 
 class robot():
     class p_pi(nn.Module):
