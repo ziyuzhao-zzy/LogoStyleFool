@@ -1,5 +1,3 @@
--- Disclaimer: This GitHub repository is under routine maintenance.
-  
 # LogoStyleFool
 
 <div align="center">
