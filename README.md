@@ -3,7 +3,7 @@
 # LogoStyleFool
 
 <div align="center">
-  <img src="images/Fig1.png" width="800px" />
+  <img src="Images/Fig1.png" width="800px" />
 </div>
 
 This is the source code for our paper "LogoStyleFool: Vitiating Video Recognition Systems via Logo Style Transfer" (AAAI 2024).
