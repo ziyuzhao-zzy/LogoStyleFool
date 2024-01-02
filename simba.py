@@ -114,7 +114,7 @@ def simba_dct(model, clip, label, h, w, size, max_iters, freq_dims, epsilon, lin
             remaining = preds.ne(label)
         else:
             remaining = preds.eq(label)
-
+            
         if remaining.sum() == 0:
             adv = clip.clone()
             adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(x, expand_dims, size))).clamp(0, 1)
@@ -125,33 +125,111 @@ def simba_dct(model, clip, label, h, w, size, max_iters, freq_dims, epsilon, lin
             break
         if k > 0:
             succs[k-1] = ~remaining
-        
-        dim = torch.randint(0, 3 * expand_dims * expand_dims, (1, )).cuda()
-        for i in range(15):
-            dim = torch.cat((dim, torch.randint((i + 1)* 3 * expand_dims * expand_dims, (i + 2) * 3 * expand_dims * expand_dims, (1, )).cuda()), 0)
-        
-        queries_k = 0
+        dim = indices[k % n_dims]
         probs_k = prev_probs.clone()
-        
-        for i in range(16):
-            diff = torch.zeros(n_dims).cuda()
-            direct = torch.randint(0, 2, (16, )).cuda()
-            direct[direct == 0] = -1
-            diff[dim] = direct * epsilon * 0.25
-            vec = x + diff
+        queries_k = 0
+        if x[dim] == epsilon:
+            # trying negative direction
             adv = clip.clone()
-            adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(vec, expand_dims, size))).clamp(0, 1)
-            vec_probs = model.get_target_val(adv, label)
-
+            left_vec = x.clone()
+            left_vec[dim] = -epsilon
+            adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(left_vec, expand_dims, size))).clamp(0, 1)
+            left_probs = model.get_target_val(adv, label)
+            # increase query count for all images
             queries_k += 1
             if targeted:
-                improved = vec_probs.gt(prev_probs)
+                improved = left_probs.gt(prev_probs)
             else:
-                improved = vec_probs.lt(prev_probs)
+                improved = left_probs.lt(prev_probs)
+            # only increase query count further by 1 for images that did not improve in adversarial loss
             if improved.sum() > 0:
-                x = vec
-                probs_k = vec_probs
-                break
+                x = left_vec
+                probs_k = left_probs
+            # try zero direction
+            else:
+                queries_k += 1
+                zero_vec = x.clone()
+                zero_vec[dim] = 0
+                adv = clip.clone()
+                adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(zero_vec, expand_dims, size))).clamp(0, 1)
+                zero_probs = model.get_target_val(adv, label)
+                if targeted:
+                    zero_improved = zero_probs.gt(prev_probs)
+                else:
+                    zero_improved = zero_probs.lt(prev_probs)
+                probs_k = prev_probs.clone()
+                # update x depending on which direction improved
+                if zero_improved.sum() > 0:
+                    x = zero_vec
+                    probs_k = zero_probs
+        elif x[dim] == 0:
+            # trying negative direction
+            left_vec = x.clone()
+            left_vec[dim] = -epsilon
+            adv = clip.clone()
+            adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(left_vec, expand_dims, size))).clamp(0, 1)
+            left_probs = model.get_target_val(adv, label)
+            # increase query count for all images
+            queries_k += 1
+            if targeted:
+                improved = left_probs.gt(prev_probs)
+            else:
+                improved = left_probs.lt(prev_probs)
+            # only increase query count further by 1 for images that did not improve in adversarial loss
+            if improved.sum() > 0:
+                x = left_vec
+                probs_k = left_probs
+            # try positive direction
+            else:
+                right_vec = x.clone()
+                right_vec[dim] = epsilon
+                queries_k += 1
+                adv = clip.clone()
+                adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(right_vec, expand_dims, size))).clamp(0, 1)
+                right_probs = model.get_target_val(adv, label)
+                if targeted:
+                    right_improved = right_probs.gt(prev_probs)
+                else:
+                    right_improved = right_probs.lt(prev_probs)
+                probs_k = prev_probs.clone()
+                # update x depending on which direction improved
+                if right_improved.sum() > 0:
+                    x = right_vec
+                    probs_k = right_probs
+        else:
+            # trying zero direction
+            zero_vec = x.clone()
+            zero_vec[dim] = 0
+            adv = clip.clone()
+            adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(zero_vec, expand_dims, size))).clamp(0, 1)
+            zero_probs = model.get_target_val(adv, label)
+            # increase query count for all images
+            queries_k += 1
+            if targeted:
+                improved = zero_probs.gt(prev_probs)
+            else:
+                improved = zero_probs.lt(prev_probs)
+            # only increase query count further by 1 for images that did not improve in adversarial loss
+            if improved.sum() > 0:
+                x = zero_vec
+                probs_k = zero_probs
+            # try positive direction
+            else:
+                right_vec = x.clone()
+                right_vec[dim] = epsilon
+                queries_k += 1
+                adv = clip.clone()
+                adv[:, :, h:h+size, w:w+size] = (adv[:, :, h:h+size, w:w+size] + trans(expand_vector(right_vec, expand_dims, size))).clamp(0, 1)
+                right_probs = model.get_target_val(adv, label)
+                if targeted:
+                    right_improved = right_probs.gt(prev_probs)
+                else:
+                    right_improved = right_probs.lt(prev_probs)
+                probs_k = prev_probs.clone()
+                # update x depending on which direction improved
+                if right_improved.sum() > 0:
+                    x = right_vec
+                    probs_k = right_probs
 
         probs[k] = probs_k
         queries[k] = queries_k
