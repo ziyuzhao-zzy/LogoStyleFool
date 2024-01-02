@@ -81,6 +81,7 @@ def simba_perturb(model, y, num, targeted = True, num_iters=1500, epsilon=0.1):
         queries.append(query)
         if (targeted and pred == y) or (not targeted and pred != y):
             res.append(x[0, :, :, :].squeeze(0))
+            n += 1
     return res, sum(queries)
 
 def simba_dct(model, clip, label, h, w, size, max_iters, freq_dims, epsilon, linf_bound=0.0,
